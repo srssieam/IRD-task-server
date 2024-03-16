@@ -49,6 +49,15 @@ app.get('/data', (req, res) => {
   });
 
 
+  app.get('/category-data', (req, res) => {
+    db.all('SELECT * FROM category', (err, rows) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json(rows);
+    });
+  });
 
 app.get('/', (req, res) => {
     res.send('Server is running!');
