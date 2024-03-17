@@ -54,15 +54,32 @@ app.get('/data', (req, res) => {
   });
 
 
-  // get category data
+  // get category data with search functionality
   app.get('/category-data', (req, res) => {
-    db.all('SELECT * FROM category', (err, rows) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json(rows);
-    });
+    const searchText = req.query.search;
+    // console.log(searchText)
+
+    if(searchText){
+      db.all('SELECT * FROM category WHERE cat_name_en LIKE ?', [`%${searchText}%`], (err, rows) => {
+        if (err) {
+          // console.error('Database error:', err.message);
+          res.status(500).json({ error: err.message });
+          return;
+        }
+        // console.log('Search results:', rows);
+        res.json(rows);
+      });
+    }else{
+      db.all('SELECT * FROM category', (err, rows) => {
+        if (err) {
+          res.status(500).json({ error: err.message });
+          return;
+        }
+        res.json(rows);
+      });
+    }
+    
+    
   });
 
   // get sub-category data
@@ -111,6 +128,7 @@ app.get('/data', (req, res) => {
       res.json(rows);
     });
   });
+
 
 app.get('/', (req, res) => {
     res.send('Server is running!');
