@@ -1,9 +1,14 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
-
+const cors = require('cors');
 const app = express();
 const PORT = 3001;
 const db = new sqlite3.Database('dua_main.sqlite');
+
+
+// middleware
+app.use(cors());
+app.use(express.json())
 
 
 // Endpoint to list all tables in the database
@@ -49,8 +54,56 @@ app.get('/data', (req, res) => {
   });
 
 
+  // get category data
   app.get('/category-data', (req, res) => {
     db.all('SELECT * FROM category', (err, rows) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json(rows);
+    });
+  });
+
+  // get sub-category data
+  app.get('/sub-category-data', (req, res) => {
+    db.all('SELECT * FROM sub_category', (err, rows) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json(rows);
+    });
+  });
+
+// get sub-category data for specific category id
+  app.get('/sub-category/:id', (req, res) => {
+    const subId = req.params.id;
+    db.all('SELECT * FROM sub_category WHERE cat_id = ?', [subId], (err, rows) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json(rows);
+    });
+  });
+
+  // get all dua data
+  app.get('/dua-data', (req, res) => {
+    db.all('SELECT * FROM dua', (err, rows) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json(rows);
+    });
+  });
+
+ // get dua data for specific category id
+  app.get('/duas/:id', (req, res) => {
+    const catId = req.params.id;
+    // console.log(catId)
+    db.all('SELECT * FROM dua WHERE cat_id = ?', [catId], (err, rows) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
